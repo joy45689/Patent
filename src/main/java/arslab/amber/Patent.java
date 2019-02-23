@@ -1,5 +1,6 @@
 package arslab.amber;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -81,8 +82,90 @@ public class Patent
     }
 
 
+    /*Multiplication*/
+    /**
+     * Multiplication
+     * Encrypt @param v1 and @param v2, then do Enc(v1)*Enc(v2)
+     * Finally return the Dec(Enc(v1)*Enc(v2))
+     * @param v1 the first plaintext
+     * @param v2 the second plaintext
+     * @param k the key
+     * @param s the key
+     * @param R the noise
+     * @param P the noise
+     * */
+    double Hmul(double v1, double v2, double[] k, double[] s, List<double[]>R, List<double[]>P) {
+        /*Encrypt v1 and v2*/
+        double[] c1 = enc3(k, s, v1, R.get(0), P.get(0));
+        double[] c2 = enc3(k, s, v2, R.get(1), P.get(1));
+        /*Multiplication*/
+        List<double[]>c=new ArrayList<>();
+        double[] temp;
+        for (double aC1 : c1) {
+            temp = new double[c1.length];
+            for (int j = 0; j < c2.length; j++) {
+                temp[j] = aC1 * c2[j];
+            }
+            c.add(temp);
+        }
+        /*Decrypt Enc(v1)*Enc(v2)*/
+        double[] c_temp=new double[c1.length];
+            /* Step 1: for i from 1 to n, perform the following decryption to get (c1[i]*c2) */
+        for(int i=0;i<c_temp.length;i++){
+            c_temp[i]=dec3(k,s,c.get(i));
+        }
+            /* Step 2: perform the following decryption to get (c1*c2) */
+        return dec3(k,s,c_temp);
+    }
 
 
+    /*Homomorphism - SUM */
+    public double Hsum(double[] V, double[] k, double[] s, List<double[]>R, List<double[]>P){
+        /*Encrypt each v in V*/
+        List<double[]>C=new ArrayList<>();
+        int count=0;
+        for(double v:V){
+            C.add(enc3(k,s,v,R.get(count),P.get(count)));
+            count++;
+        }
+        /*SUM*/
+        double[] temp=new double[k.length];
+        for(int i=0;i<temp.length;i++){
+            for (double[] c : C) {
+                temp[i] += c[i];
+            }
+        }
+        /*Decrypt*/
+        return dec3(k,s,temp);
+
+    }
+
+    /*Homomorphism - avg */
+    public double Havg(double[] V, double[] k, double[] s, List<double[]>R, List<double[]>P){
+        /*Encrypt each v in V*/
+        List<double[]>C=new ArrayList<>();
+        int count=0;
+        for(double v:V){
+            C.add(enc3(k,s,v,R.get(count),P.get(count)));
+            count++;
+        }
+        /*avg*/
+        double[] temp=new double[k.length];
+        for(int i=0;i<temp.length;i++){
+            for (double[] c : C) {
+                temp[i] += c[i];
+            }
+            temp[i]/=V.length;
+        }
+        /*Decrypt*/
+        return dec3(k,s,temp);
+
+    }
+
+
+
+
+    /*--------Sum---------*/
     double sum(double[] p, double[] r, double[] k,int n){
         double sum=0;
         for(int i=0;i<n;i++){

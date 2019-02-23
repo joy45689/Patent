@@ -87,17 +87,35 @@ public class PatentTest
         double result;
         int i=0;
         for(double v:V){
-            double []cipher=patent.enc3(k,s,v,r.get(i),p.get(i));
-            result=patent.dec3(k,s,cipher);
+            double []cipher=patent.enc3(k, s, v, r.get(i), p.get(i));
+            result=patent.dec3(k, s, cipher);
             i++;
             System.out.printf("Expected:%f Actual:%f\n",v,result);
             Assert.assertEquals(v, result, 0.00000001);
         }
     }
 
+    @Test
+    public void mul(){
+        double v1=48;
+        double v2=55.3;
+        double actual=patent.Hmul(v1, v2, k, s, r.subList(0, 2), p.subList(0,2));
+        System.out.printf("Expected:%f Actual:%f\n",v1*v2,actual);
+        Assert.assertEquals(v1*v2, actual, 0.00000001);
+    }
 
+    @Test
+    public void sum(){
+        double actual=patent.Hsum(V, k, s, r, p);
+        System.out.printf("Expected:%f Actual:%f\n",patent.sum(V),actual);
+        Assert.assertEquals(patent.sum(V), actual, 0.00000001);
+    }
 
-
-
+    @Test
+    public void avg(){
+        double actual=patent.Havg(V, k, s, r, p);
+        System.out.printf("Expected:%f Actual:%f\n",patent.sum(V)/V.length,actual);
+        Assert.assertEquals(patent.sum(V)/V.length, actual, 0.00000001);
+    }
 
 }
